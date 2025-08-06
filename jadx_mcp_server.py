@@ -10,6 +10,7 @@ See the file 'LICENSE' for copying permission
 
 import httpx
 import logging
+import argparse
 
 from typing import List, Union, Dict, Optional
 from mcp.server.fastmcp import FastMCP
@@ -24,12 +25,33 @@ console_handler.setLevel(logging.ERROR)
 console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 logger.addHandler(console_handler)
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='JADX MCP Server')
+    parser.add_argument('--host', 
+                       default="127.0.0.1",
+                       help='JADX server host (default: 127.0.0.1)')
+    parser.add_argument('--port', 
+                       type=int,
+                       default=int(8650),
+                       help='JADX server port (default: 8650)')
+    return parser.parse_args()
+
+
+# Parse args
+args = parse_arguments()
+if args.host:
+    JADX_HOST = args.host
+else:
+    JADX_HOST = "127.0.0.1"
+if args.port:
+    JADX_PORT = args.port
+else:
+    JADX_PORT = 8650
+JADX_HTTP_BASE = f"http://{JADX_HOST}:{JADX_PORT}"
+print(JADX_HTTP_BASE)
+
 # Initialize the MCP server
 mcp = FastMCP("JADX-AI-MCP Plugin Reverse Engineering Server")
-
-# To do : implement logic to handle the scenario where port is not available
-JADX_HTTP_BASE = "http://127.0.0.1:8650" # Base URL for the JADX-AI-MCP Plugin
-
 
 # Generic method to fetch data from jadx
 async def get_from_jadx(endpoint: str, params: dict = {}) -> Union[str, dict]:
